@@ -39,19 +39,27 @@ jobs:
       - name: Extract RPG project
         run: |
           ZIP_FILE=$(find . -maxdepth 1 -name 'Rayan_Life_RPG_GitHub_Ready*.zip' -print -quit)
+
           if [ -z "$ZIP_FILE" ]; then
             echo "RPG ZIP file not found"
             exit 1
           fi
+
           mkdir source
           unzip -q "$ZIP_FILE" -d source
-          test -d source/android_project/app
+
+          PROJECT_DIR="source/Rayan_Life_RPG_GitHub_Ready"
+
+          test -f "$PROJECT_DIR/settings.gradle"
+          test -d "$PROJECT_DIR/app"
+
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Build APK
-        run: gradle -p source/android_project assembleDebug
+        run: gradle -p "$PROJECT_DIR" assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Rayan-Life-RPG-APK
-          path: source/android_project/app/build/outputs/apk/debug/app-debug.apk
+          path: source/Rayan_Life_RPG_GitHub_Ready/app/build/outputs/apk/debug/app-debug.apk
